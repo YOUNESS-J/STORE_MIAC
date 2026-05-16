@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import '../models/product.dart';
 import '../providers/cart_provider.dart';
-import '../providers/favorite_provider.dart'; // Matnsach t-importi hada
+import '../providers/favorite_provider.dart'; 
 
 class ProductDetailScreen extends StatelessWidget {
   final Product product;
@@ -22,7 +22,7 @@ class ProductDetailScreen extends StatelessWidget {
         children: [
           CustomScrollView(
             slivers: [
-              // 1. L'IMAGE LFO9 (Slider vibe)
+              // 
               SliverAppBar(
                 expandedHeight: 450,
                 pinned: true,
@@ -57,7 +57,7 @@ class ProductDetailScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // SMIT L'COOPÉRATIVE
+                      //
                       Text(
                         "OR PUR D'ESSAOUIRA",
                         style: TextStyle(
@@ -69,7 +69,7 @@ class ProductDetailScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       
-                      // SMIT L'PRODUIT O L'TAMAN
+                      // 
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -108,7 +108,7 @@ class ProductDetailScreen extends StatelessWidget {
 
                       const SizedBox(height: 25),
 
-                      // 2. KHASIYA DYAL L'AUDIO (B7al f l'image)
+                      // 
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
@@ -144,7 +144,7 @@ class ProductDetailScreen extends StatelessWidget {
                               ),
                             ),
                             IconButton(
-                              onPressed: () {}, // Hna ghadi t-khdem l'audio moustaqbalan
+                              onPressed: () {}, 
                               icon: const Icon(Icons.play_circle_fill, color: Colors.white, size: 40),
                             )
                           ],
@@ -168,7 +168,7 @@ class ProductDetailScreen extends StatelessWidget {
                         ),
                       ),
 
-                      const SizedBox(height: 120), // Bach may-ghttich l'bouton lte7t
+                      const SizedBox(height: 120),
                     ],
                   ),
                 ),
@@ -176,7 +176,7 @@ class ProductDetailScreen extends StatelessWidget {
             ],
           ),
 
-          // 3. BARRE D'ACHAT L'TE7T (B7al l'image)
+          // 
           Positioned(
             bottom: 0,
             left: 0,
@@ -191,7 +191,7 @@ class ProductDetailScreen extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  // L'Glbiya (Favorite)
+                  // 
                   Container(
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.grey[300]!),
@@ -206,7 +206,7 @@ class ProductDetailScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 15),
-                  // Ajouter au panier
+                  //
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {

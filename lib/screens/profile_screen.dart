@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // <-- Zedna hada bach nchoufo l'user
+import 'package:firebase_auth/firebase_auth.dart'; 
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Kanchoufo wach kayn chi user m-connecti bssa7
+    //
     final User? user = FirebaseAuth.instance.currentUser;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(24, 80, 24, 120),
       child: Column(
         children: [
-          // 1. Ila kan l'user MA-CONNECTIX (Logged Out)
+          // 
           if (user == null) ...[
             CircleAvatar(
               radius: 60,
@@ -36,7 +36,7 @@ class ProfileScreen extends StatelessWidget {
               child: const Text('SIGN IN / REGISTER'),
             ),
           ] 
-          // 2. Ila kan l'user M-CONNECTI (Logged In)
+          // 
           else ...[
             CircleAvatar(
               radius: 60,
@@ -52,8 +52,8 @@ class ProfileScreen extends StatelessWidget {
             const SizedBox(height: 20),
             ListTile(
               onTap: () async {
-                await FirebaseAuth.instance.signOut(); // Kankhrjo l'user
-                Navigator.pushReplacementNamed(context, '/main'); // Kan-refrechiw l'page
+                await FirebaseAuth.instance.signOut(); 
+                Navigator.pushReplacementNamed(context, '/main');
               },
               title: const Text('Sign Out', style: TextStyle(color: Colors.redAccent)),
               leading: const Icon(Icons.logout, color: Colors.redAccent),

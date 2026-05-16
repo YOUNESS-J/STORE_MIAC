@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'catalog_screen.dart';
 import 'home_screen.dart';
 import 'profile_screen.dart';
-import 'cart_screen.dart'; // <-- Zedna l'import dyal l'Panier
+import 'cart_screen.dart'; 
 
 class MainNavigationShell extends StatefulWidget {
   const MainNavigationShell({super.key});
@@ -18,7 +18,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
   final List<Widget> _pages = [
     const HomeScreen(),
     const CatalogScreen(),
-    const CartScreen(),    // <-- Zedna l'Page hna f tartib (ra9m 3)
+    const CartScreen(),    
     const ProfileScreen(),
   ];
 
@@ -51,7 +51,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
             showUnselectedLabels: false,
             selectedItemColor: const Color(0xFF3e5219),
             unselectedItemColor: const Color(0xFF3e5219).withOpacity(0.3),
-            type: BottomNavigationBarType.fixed, // Zedna hadi bach ybano 4 icônes mzyan
+            type: BottomNavigationBarType.fixed,
             items: const [
               BottomNavigationBarItem(
                 icon: Icon(Icons.home_outlined),
@@ -63,7 +63,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                 activeIcon: Icon(Icons.grid_view),
                 label: 'Catalog',
               ),
-              BottomNavigationBarItem( // <-- Zedna l'Icone dyal l'Panier
+              BottomNavigationBarItem(
                 icon: Icon(Icons.shopping_cart_outlined),
                 activeIcon: Icon(Icons.shopping_cart),
                 label: 'Cart',

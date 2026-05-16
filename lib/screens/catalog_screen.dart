@@ -14,7 +14,7 @@ class CatalogScreen extends StatefulWidget {
 class _CatalogScreenState extends State<CatalogScreen> {
   String selectedCategory = 'All';
 
-  // Hada t-tmsil dyal les catégories li f l'photo
+  //
   final List<Map<String, dynamic>> categories = [
     {'name': 'All', 'icon': Icons.grid_view, 'color': Color(0xFFe8f0d1)},
     {'name': 'Cosmetics', 'icon': Icons.spa, 'color': Color(0xFFf9e8d4)},
@@ -24,7 +24,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Hna fin kat-jib list dyal les produits (matalan mn chi list 3ndk)
+    // 
     final List<Product> dummyProducts = [
       Product(id: '1', name: 'Huile d\'Argan Bio', price: 250, image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCqtqS9S9YIxGmT4TMbcZ_NWNZva0lp7pqaGVrbSYkbJxXTIfOnlhbqdin09VYV6ausL4awSZ1Xs5xhHD-pFtcMS8OJpDTplWslVP64EilnAmJlv5pJdMX4m316uk9e0zcyNAMSenHIQPLzuVRmoYr_Av0efluphUFa7TELPi8CXzt7nssfEgz0jYJy43Da4WrLDuhf3FBzAeIQA5llx7NhErXYs1GZAhohGhzh3Wf8pgRU7NmdWwwkPzvjXUZLXSNhZQUGUs1tMr_l', description: 'Pure 100%', category: 'Cosmetics'),
       Product(id: '2', name: 'Premium Saffron', price: 1200, image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAwIy0Q24UXeoOBS93iLwRMLlH7uv7axphyY2eR3goFrgX4tL5H3sqczL6MlA6XWqWzWLxUdXnUxAec1-M_fG7rtlRsUOyMoDFtJjUKOFlBjWsv2CNaoO-bqurwWstDVuQ484F9ACBktaysVHhvt3BIEXHz7J1ViLHm3TPGKpnqfu6DKwxB6Qxj4PLxjpIGQF31mby9vCbit1aGIfcP0ZhQYfpuqbmVZD7dT2a_1NZbJwKkFdIooIhLRUtC_01RnEO59zQ3OnC1Ja3m', description: 'Fait main', category: 'Artisanat'),
@@ -58,7 +58,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
               ),
             ),
 
-            // 2. LES CATÉGORIES (Horizontal list b les icons)
+            // 2. LES CATÉGORIES 
             SizedBox(
               height: 100,
               child: ListView.builder(
@@ -101,7 +101,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
               ),
             ),
 
-            // 3. GRID DES PRODUITS (2 colonnes b7al f l'photo)
+            // 3. GRID DES PRODUITS 
             Expanded(
               child: GridView.builder(
                 padding: const EdgeInsets.all(20),

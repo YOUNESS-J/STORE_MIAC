@@ -32,7 +32,8 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 
-  // Fonction li kadiro Login ola Sign Up
+  // Fonction liée à l'authentification (login/signup)
+  
   Future<void> _submitAuth() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
@@ -134,16 +135,16 @@ class _AuthScreenState extends State<AuthScreen> {
                           ],
                         ),
                         const SizedBox(height: 30),
-                        // Champ dyal Email
+                        //
                         _field('Email Address', Icons.mail_outline, _emailController, false),
                         const SizedBox(height: 20),
-                        // Champ dyal Mot de passe
+                        // 
                         _field('Password', Icons.lock_outline, _passwordController, true),
                         const SizedBox(height: 40),
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
-                            // Kan7ebso l'button mnin tkon katcharga (isLoading)
+                            // 
                             onPressed: isLoading ? null : _submitAuth, 
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF3e5219), 

@@ -61,7 +61,7 @@ class HeroHeader extends StatelessWidget {
             const Text('Liquid gold harvested from the heart of the Souss Valley.', style: TextStyle(color: Colors.white70, fontSize: 16)),
             const SizedBox(height: 24),
             ElevatedButton(
-              onPressed: () {}, // Zid navigation dyalk hna ila bghitiha tdih lchi blassa
+              onPressed: () {}, 
               style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF3e5219), foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 18), shape: const StadiumBorder()),
               child: const Text('EXPLORE COLLECTION'),
             ),
