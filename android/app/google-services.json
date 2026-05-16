@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "648316138738",
+    "project_id": "stor-miac",
+    "storage_bucket": "stor-miac.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:648316138738:android:8f57bf0f47c69da747cc6b",
+        "android_client_info": {
+          "package_name": "com.example.store_miac"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD6emJWE-I1_Q9tLvCsjGsp3yPgMbcdnMs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
