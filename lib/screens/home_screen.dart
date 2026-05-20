@@ -67,7 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 1. Search Bar (Barre de recherche)
+
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 child: Container(
@@ -88,7 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-              // 2. Hero Banner (Artisan Tiznit Silver)
+
               Padding(
                 padding: const EdgeInsets.all(20),
                 child: Container(
@@ -144,7 +144,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-              // 3. Categories Header
+
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
@@ -165,7 +165,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-              // 4. Categories Horizontal List
+
               SizedBox(
                 height: 100,
                 child: ListView.builder(
@@ -201,7 +201,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-              // 5. Popular Products Header
+
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 child: Row(
@@ -222,7 +222,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-              // 6. Grid View dyal l-muntajat (Popular Products)
+
               displayedProducts.isEmpty
               ? const Center(child: Padding(padding: EdgeInsets.all(20), child: Text("No products found")))
               : GridView.builder(
@@ -239,7 +239,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   itemBuilder: (ctx, i) => _buildProductCard(context, displayedProducts[i]),
                 ),
 
-              // 7. Certified Cooperatives Header & Subtitle
+
               Padding(
                 padding: const EdgeInsets.only(left: 20, top: 30, right: 20),
                 child: Column(
@@ -258,7 +258,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-              // 8. Cooperatives Horizontal List
+
               SizedBox(
                 height: 130,
                 child: ListView.builder(
@@ -297,7 +297,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Card dyal l-muntaj b l-design l-7aqiqi
+
   Widget _buildProductCard(BuildContext context, Product product) {
     final favProvider = Provider.of<FavoriteProvider>(context);
     bool isFav = favProvider.isFavorite(product.id);

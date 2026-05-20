@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart'; 
-import 'favorites_screen.dart'; // L-import dyal l-page l-jdida
+import 'favorites_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -14,7 +14,7 @@ class ProfileScreen extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(24, 80, 24, 120),
       child: Column(
         children: [
-          // GUEST VIEW
+
           if (user == null) ...[
             CircleAvatar(
               radius: 60,
@@ -36,7 +36,7 @@ class ProfileScreen extends StatelessWidget {
               child: const Text('SIGN IN / REGISTER'),
             ),
           ] 
-          // LOGGED IN USER VIEW
+
           else ...[
             CircleAvatar(
               radius: 60,
@@ -47,12 +47,12 @@ class ProfileScreen extends StatelessWidget {
             Text('MEMBER SINCE 2024', style: const TextStyle(fontSize: 10, letterSpacing: 2, color: Color(0xFF94492c))),
             const SizedBox(height: 40),
             
-            // L-Qaima d-les options
+
             _profileItem('Account Settings', Icons.settings_outlined),
             _profileItem('My Orders', Icons.shopping_bag_outlined),
             _profileItem('Shipping Addresses', Icons.location_on_outlined),
             
-            // Hna t-zadt "Mes Favoris" b-nafs l-vibe o d-design d l-app dyalk!
+
             _profileItem(
               'Mes Favoris', 
               Icons.favorite_border,
@@ -79,7 +79,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  // Refactored helper bash t-9bel l-onTap dyal l-Navigation safely
+
   Widget _profileItem(String title, IconData icon, {VoidCallback? onTap}) {
     return ListTile(
       onTap: onTap,

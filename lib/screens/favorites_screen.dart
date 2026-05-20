@@ -12,13 +12,13 @@ class FavoritesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final favProvider = Provider.of<FavoriteProvider>(context);
     
-    // Filtre: n-jibo gha l-muntajat li marked az favorite f l-App kamla
+
     final List<Product> favoriteProducts = products.where((product) {
       return favProvider.isFavorite(product.id);
     }).toList();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFfcf9f0), // Khlfiya dyal l-app dyalk
+      backgroundColor: const Color(0xFFfcf9f0), 
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -33,7 +33,7 @@ class FavoritesScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // L-3onwan dyal l-page b7al screen EXACT
+
               const Text(
                 'Mes Favoris',
                 style: TextStyle(
@@ -53,7 +53,7 @@ class FavoritesScreen extends StatelessWidget {
               ),
               const SizedBox(height: 25),
               
-              // Grid dyal l-muntajat l-mufaddala
+
               Expanded(
                 child: favoriteProducts.isEmpty
                     ? const Center(
@@ -73,7 +73,7 @@ class FavoritesScreen extends StatelessWidget {
                         itemBuilder: (ctx, i) {
                           final product = favoriteProducts[i];
                           
-                          // Safe extracting dyal l-région o l-coopérative
+
                           String productRegion = 'Maroc';
                           String coopName = 'Coopérative';
                           try {
@@ -111,7 +111,7 @@ class FavoritesScreen extends StatelessWidget {
                                             errorBuilder: (c, e, s) => const Center(child: Icon(Icons.image_not_supported)),
                                           ),
                                         ),
-                                        // Badge dyal l-région t7t 3la l-isir (b7al Fès, Marrakech f t-tswira)
+
                                         Positioned(
                                           bottom: 10,
                                           left: 10,
@@ -131,7 +131,7 @@ class FavoritesScreen extends StatelessWidget {
                                             ),
                                           ),
                                         ),
-                                        // 9lb 7mr top right l-fo9
+
                                         Positioned(
                                           top: 10,
                                           right: 10,

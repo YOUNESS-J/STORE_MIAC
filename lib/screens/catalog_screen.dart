@@ -3,8 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../models/product.dart'; 
 import '../providers/favorite_provider.dart';
-import '../data/static_data.dart'; // List dyal les 30 produits
-import 'product_detail_screen.dart'; // <-- Hna rj3na l-import dyal screen detail bباش l-navigation tkhdem direct
+import '../data/static_data.dart'; 
+import 'product_detail_screen.dart'; 
 
 class CatalogScreen extends StatefulWidget {
   const CatalogScreen({super.key});
@@ -32,7 +32,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
   @override
   Widget build(BuildContext context) {
     
-    // --- GA3 LES FILTRES KHSTATUS REAL-TIME (Safe Mode) ---
+
     final List<Product> displayedProducts = products.where((product) {
       final matchesCategory = selectedCategory == 'All' || product.category == selectedCategory;
       final matchesSearch = product.name.toLowerCase().contains(searchQuery.toLowerCase());
@@ -55,11 +55,11 @@ class _CatalogScreenState extends State<CatalogScreen> {
     }).toList();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFfffbf7), // Khlfiya clean m9adda b-7al screen.jpg
+      backgroundColor: const Color(0xFFfffbf7), 
       body: SafeArea(
         child: Column(
           children: [
-            // 1. SEARCH BAR
+
             Padding(
               padding: const EdgeInsets.all(20),
               child: Container(
@@ -80,19 +80,19 @@ class _CatalogScreenState extends State<CatalogScreen> {
               ),
             ),
 
-            // FILTERS & GRID SCROLLABLE
+
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // 2. CATEGORIES TITLE
+
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                       child: Text('CATEGORIES', style: GoogleFonts.dmSans(fontSize: 11, fontWeight: FontWeight.bold, color: const Color(0xFF3e5219), letterSpacing: 1)),
                     ),
                     
-                    // CATEGORIES LIST
+
                     SizedBox(
                       height: 95,
                       child: ListView.builder(
@@ -136,7 +136,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                       ),
                     ),
 
-                    // 3. PRICE RANGE SLIDER
+
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                       child: Column(
@@ -166,7 +166,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                       ),
                     ),
 
-                    // 4. REGION FILTER
+
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                       child: Column(
@@ -206,7 +206,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                       ),
                     ),
 
-                    // 5. RATING FILTER
+
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                       child: Column(
@@ -238,13 +238,13 @@ class _CatalogScreenState extends State<CatalogScreen> {
                       ),
                     ),
 
-                    // COUNT RESULTS
+
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                       child: Text('${displayedProducts.length} Results Found', style: GoogleFonts.dmSans(fontWeight: FontWeight.bold, color: Colors.grey, fontSize: 12)),
                     ),
 
-                    // 6. GRID OF PRODUCTS
+
                     displayedProducts.isEmpty 
                     ? const Padding(
                         padding: EdgeInsets.symmetric(vertical: 30),
@@ -279,7 +279,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
     bool isFav = favProvider.isFavorite(product.id);
 
     return GestureDetector(
-      // 🚨 Hna rj3na l-navigation l-haqiqi l-m9adda b material page route direct sans bogue
+
       onTap: () {
         Navigator.push(
           context,
