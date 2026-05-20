@@ -116,7 +116,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 children: [
                   const Icon(Icons.auto_awesome, size: 60, color: Color(0xFF3e5219)),
                   const SizedBox(height: 16),
-                  Text('Maison du Maroc', style: GoogleFonts.ebGaramond(fontSize: 36, color: const Color(0xFF3e5219))),
+                  Text('MIAC', style: GoogleFonts.ebGaramond(fontSize: 36, color: const Color(0xFF3e5219))),
                   const Text('PURE ORGANIC LIVING', style: TextStyle(fontSize: 10, letterSpacing: 3, color: Color(0xFF75796b))),
                   const SizedBox(height: 60),
                   Container(

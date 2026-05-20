@@ -6,7 +6,7 @@ import '../models/product.dart';
 import '../screens/product_detail_screen.dart';
 
 class ProductGrid extends StatelessWidget {
-  const ProductGrid({super.key});
+  const ProductGrid({super.key, required String selectedCategory});
 
   @override
   Widget build(BuildContext context) {

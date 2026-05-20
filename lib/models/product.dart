@@ -8,6 +8,8 @@ class Product {
   final bool isOrganic;
   final bool isLimited;
   final Map<String, String>? specs;
+  final String region;
+  final double rating; 
 
   Product({
     required this.id,
@@ -19,5 +21,7 @@ class Product {
     this.isOrganic = false,
     this.isLimited = false,
     this.specs,
+    this.region = 'Marrakech', 
+    this.rating = 4.5,
   });
 }

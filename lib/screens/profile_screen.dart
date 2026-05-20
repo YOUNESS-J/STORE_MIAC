@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart'; 
+import 'favorites_screen.dart'; // L-import dyal l-page l-jdida
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    //
     final User? user = FirebaseAuth.instance.currentUser;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(24, 80, 24, 120),
       child: Column(
         children: [
-          // 
+          // GUEST VIEW
           if (user == null) ...[
             CircleAvatar(
               radius: 60,
@@ -36,7 +36,7 @@ class ProfileScreen extends StatelessWidget {
               child: const Text('SIGN IN / REGISTER'),
             ),
           ] 
-          // 
+          // LOGGED IN USER VIEW
           else ...[
             CircleAvatar(
               radius: 60,
@@ -46,9 +46,24 @@ class ProfileScreen extends StatelessWidget {
             Text(user.displayName ?? 'Artisan Lover', style: GoogleFonts.ebGaramond(fontSize: 28, color: const Color(0xFF3e5219))),
             Text('MEMBER SINCE 2024', style: const TextStyle(fontSize: 10, letterSpacing: 2, color: Color(0xFF94492c))),
             const SizedBox(height: 40),
+            
+            // L-Qaima d-les options
             _profileItem('Account Settings', Icons.settings_outlined),
             _profileItem('My Orders', Icons.shopping_bag_outlined),
             _profileItem('Shipping Addresses', Icons.location_on_outlined),
+            
+            // Hna t-zadt "Mes Favoris" b-nafs l-vibe o d-design d l-app dyalk!
+            _profileItem(
+              'Mes Favoris', 
+              Icons.favorite_border,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const FavoritesScreen()),
+                );
+              },
+            ),
+            
             const SizedBox(height: 20),
             ListTile(
               onTap: () async {
@@ -64,8 +79,10 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _profileItem(String title, IconData icon) {
+  // Refactored helper bash t-9bel l-onTap dyal l-Navigation safely
+  Widget _profileItem(String title, IconData icon, {VoidCallback? onTap}) {
     return ListTile(
+      onTap: onTap,
       leading: Icon(icon, color: const Color(0xFF3e5219)),
       title: Text(title, style: const TextStyle(fontSize: 15)),
       trailing: const Icon(Icons.chevron_right, size: 20),

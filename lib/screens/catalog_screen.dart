@@ -3,6 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../models/product.dart'; 
 import '../providers/favorite_provider.dart';
+import '../data/static_data.dart'; // List dyal les 30 produits
+import 'product_detail_screen.dart'; // <-- Hna rj3na l-import dyal screen detail bباش l-navigation tkhdem direct
 
 class CatalogScreen extends StatefulWidget {
   const CatalogScreen({super.key});
@@ -13,109 +15,257 @@ class CatalogScreen extends StatefulWidget {
 
 class _CatalogScreenState extends State<CatalogScreen> {
   String selectedCategory = 'All';
+  String searchQuery = '';
+  RangeValues priceRange = const RangeValues(30, 5000); 
+  String selectedRegion = 'All';
+  int selectedRating = 0; 
 
-  //
   final List<Map<String, dynamic>> categories = [
-    {'name': 'All', 'icon': Icons.grid_view, 'color': Color(0xFFe8f0d1)},
-    {'name': 'Cosmetics', 'icon': Icons.spa, 'color': Color(0xFFf9e8d4)},
-    {'name': 'Food', 'icon': Icons.restaurant, 'color': Color(0xFFf9d4d4)},
-    {'name': 'Artisanat', 'icon': Icons.palette, 'color': Color(0xFFd4e2f9)},
+    {'name': 'All', 'icon': Icons.grid_view},
+    {'name': 'Cosmetics', 'icon': Icons.spa},
+    {'name': 'Food', 'icon': Icons.restaurant},
+    {'name': 'Artisanat', 'icon': Icons.palette},
   ];
+
+  final List<String> regions = ['All', 'Marrakech', 'Tiznit', 'Agadir', 'Essaouira'];
 
   @override
   Widget build(BuildContext context) {
-    // 
-    final List<Product> dummyProducts = [
-      Product(id: '1', name: 'Huile d\'Argan Bio', price: 250, image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCqtqS9S9YIxGmT4TMbcZ_NWNZva0lp7pqaGVrbSYkbJxXTIfOnlhbqdin09VYV6ausL4awSZ1Xs5xhHD-pFtcMS8OJpDTplWslVP64EilnAmJlv5pJdMX4m316uk9e0zcyNAMSenHIQPLzuVRmoYr_Av0efluphUFa7TELPi8CXzt7nssfEgz0jYJy43Da4WrLDuhf3FBzAeIQA5llx7NhErXYs1GZAhohGhzh3Wf8pgRU7NmdWwwkPzvjXUZLXSNhZQUGUs1tMr_l', description: 'Pure 100%', category: 'Cosmetics'),
-      Product(id: '2', name: 'Premium Saffron', price: 1200, image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAwIy0Q24UXeoOBS93iLwRMLlH7uv7axphyY2eR3goFrgX4tL5H3sqczL6MlA6XWqWzWLxUdXnUxAec1-M_fG7rtlRsUOyMoDFtJjUKOFlBjWsv2CNaoO-bqurwWstDVuQ484F9ACBktaysVHhvt3BIEXHz7J1ViLHm3TPGKpnqfu6DKwxB6Qxj4PLxjpIGQF31mby9vCbit1aGIfcP0ZhQYfpuqbmVZD7dT2a_1NZbJwKkFdIooIhLRUtC_01RnEO59zQ3OnC1Ja3m', description: 'Fait main', category: 'Artisanat'),
-      Product(id: '3', name: 'Miel de Thym', price: 180, image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDvTNVCYYbnpLTIOO3_SZG77oqAtQ5otdFkmP_y38U6W7DmX16da3HqX8YHbmLH1rl-5UlA9rZ6kyolzOL0yd59_1lL5ai4y8NfakMw7Jy9U_2aM5iFK6pG5BH3tKnnhmjtuopskbpbRkXyrRr5CzOfzu97RtzRRdycdcADL0p7HdOkN4HdTS3N8cc6TOswDVwAcxESbQ7fp6x0TPeAOx2uIhZSB1WJN32gZavAXZb-TEhIRITnQv_whNUDfrwx7o4VFYWWI_VHtjTQ', description: 'Naturel', category: 'Food'),
-      Product(id: '4', name: 'Atlas Clay Mask', price: 850, image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAFrsXdO8iuhRRZjnQtRTxCO_u4n_hsy1bTn8bcCYsPl8qlR2E1QcLj5Z2gU8flpKBgjKveWaguxL-wriDc59C2wG27sPSqQHMY4jrz2ZWh6L1hOy0hEBAbxzpizVUWqkvnP-No1dxr5CMJgjaH21RcUi0dhB_BzxzCu-Lu0HMwrshJMNHvCkFME8TRPOunbv-DPCM7W5Q9ty6U1cIGs6QkMqzjSH5P05oO27DfFi3NL51wYLmovzV6VGfWitWjYPTEHKfWn-slJvam', description: 'Soie pure', category: 'Artisanat'),
-    ];
+    
+    // --- GA3 LES FILTRES KHSTATUS REAL-TIME (Safe Mode) ---
+    final List<Product> displayedProducts = products.where((product) {
+      final matchesCategory = selectedCategory == 'All' || product.category == selectedCategory;
+      final matchesSearch = product.name.toLowerCase().contains(searchQuery.toLowerCase());
+      final matchesPrice = product.price >= priceRange.start && product.price <= priceRange.end;
+      
+      String productRegion = 'All';
+      double productRating = 4.8;
+      try {
+        productRegion = (product as dynamic).region ?? 'All';
+        productRating = ((product as dynamic).rating ?? 4.8).toDouble();
+      } catch (e) {
+        productRegion = 'All';
+        productRating = 4.8;
+      }
+
+      final matchesRegion = selectedRegion == 'All' || productRegion.toLowerCase() == selectedRegion.toLowerCase();
+      final matchesRating = productRating >= selectedRating;
+
+      return matchesCategory && matchesSearch && matchesPrice && matchesRegion && matchesRating;
+    }).toList();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFfcf9f0),
+      backgroundColor: const Color(0xFFfffbf7), // Khlfiya clean m9adda b-7al screen.jpg
       body: SafeArea(
         child: Column(
           children: [
-            // 1. BARRE DE RECHERCHE (Search Bar)
+            // 1. SEARCH BAR
             Padding(
               padding: const EdgeInsets.all(20),
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 15),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: const Color(0xFFf7f4f0), 
                   borderRadius: BorderRadius.circular(15),
-                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10)],
                 ),
-                child: const TextField(
-                  decoration: InputDecoration(
-                    hintText: 'Rechercher Argan, Tapis...',
+                child: TextField(
+                  onChanged: (value) => setState(() => searchQuery = value),
+                  decoration: const InputDecoration(
+                    hintText: 'Search for Huile, Tapis, Dattes...',
                     border: InputBorder.none,
-                    icon: Icon(Icons.search, color: Color(0xFF3e5219)),
-                    suffixIcon: Icon(Icons.tune, color: Color(0xFF3e5219)),
+                    icon: Icon(Icons.search, color: Colors.black54),
+                    suffixIcon: Icon(Icons.mic, color: Color(0xFF3e5219)),
                   ),
                 ),
               ),
             ),
 
-            // 2. LES CATÉGORIES 
-            SizedBox(
-              height: 100,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.only(left: 20),
-                itemCount: categories.length,
-                itemBuilder: (ctx, i) {
-                  bool isSelected = selectedCategory == categories[i]['name'];
-                  return GestureDetector(
-                    onTap: () => setState(() => selectedCategory = categories[i]['name']),
-                    child: Container(
-                      margin: const EdgeInsets.only(right: 20),
+            // FILTERS & GRID SCROLLABLE
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // 2. CATEGORIES TITLE
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                      child: Text('CATEGORIES', style: GoogleFonts.dmSans(fontSize: 11, fontWeight: FontWeight.bold, color: const Color(0xFF3e5219), letterSpacing: 1)),
+                    ),
+                    
+                    // CATEGORIES LIST
+                    SizedBox(
+                      height: 95,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        padding: const EdgeInsets.only(left: 20),
+                        itemCount: categories.length,
+                        itemBuilder: (ctx, i) {
+                          bool isSelected = selectedCategory == categories[i]['name'];
+                          return GestureDetector(
+                            onTap: () => setState(() => selectedCategory = categories[i]['name']),
+                            child: Container(
+                              margin: const EdgeInsets.only(right: 24),
+                              child: Column(
+                                children: [
+                                  Container(
+                                    width: 55,
+                                    height: 55,
+                                    decoration: BoxDecoration(
+                                      color: isSelected ? const Color(0xFF94492c) : const Color(0xFFebe8df),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(
+                                      categories[i]['icon'], 
+                                      color: isSelected ? Colors.white : const Color(0xFF3e5219)
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    categories[i]['name'], 
+                                    style: GoogleFonts.dmSans(
+                                      fontSize: 11, 
+                                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal, 
+                                      color: isSelected ? const Color(0xFF94492c) : const Color(0xFF3e5219)
+                                    )
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+
+                    // 3. PRICE RANGE SLIDER
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Container(
-                            padding: const EdgeInsets.all(15),
-                            decoration: BoxDecoration(
-                              color: isSelected ? const Color(0xFF3e5219) : categories[i]['color'],
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              categories[i]['icon'],
-                              color: isSelected ? Colors.white : const Color(0xFF3e5219),
-                            ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('PRICE RANGE', style: GoogleFonts.dmSans(fontSize: 11, fontWeight: FontWeight.bold, color: const Color(0xFF3e5219), letterSpacing: 1)),
+                              Text('PRICE: ${priceRange.start.toInt()} - ${priceRange.end.toInt()} DH', style: GoogleFonts.dmSans(fontWeight: FontWeight.bold, color: const Color(0xFF94492c), fontSize: 12)),
+                            ],
                           ),
-                          const SizedBox(height: 8),
-                          Text(
-                            categories[i]['name'],
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                              color: const Color(0xFF3e5219),
+                          SliderTheme(
+                            data: SliderTheme.of(context).copyWith(
+                              activeTrackColor: const Color(0xFF3e5219),
+                              inactiveTrackColor: Colors.grey[300],
+                              thumbColor: const Color(0xFF94492c),
+                            ),
+                            child: RangeSlider(
+                              values: priceRange,
+                              min: 0,
+                              max: 5000,
+                              onChanged: (values) => setState(() => priceRange = values),
                             ),
                           ),
                         ],
                       ),
                     ),
-                  );
-                },
-              ),
-            ),
 
-            // 3. GRID DES PRODUITS 
-            Expanded(
-              child: GridView.builder(
-                padding: const EdgeInsets.all(20),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: 0.7,
-                  crossAxisSpacing: 15,
-                  mainAxisSpacing: 15,
+                    // 4. REGION FILTER
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('REGION', style: GoogleFonts.dmSans(fontSize: 11, fontWeight: FontWeight.bold, color: const Color(0xFF3e5219), letterSpacing: 1)),
+                          const SizedBox(height: 10),
+                          SizedBox(
+                            height: 38,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: regions.length,
+                              itemBuilder: (context, index) {
+                                bool isSelected = selectedRegion == regions[index];
+                                return GestureDetector(
+                                  onTap: () => setState(() => selectedRegion = regions[index]),
+                                  child: Container(
+                                    margin: const EdgeInsets.only(right: 10),
+                                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+                                    decoration: BoxDecoration(
+                                      color: isSelected ? const Color(0xFF3e5219) : Colors.white,
+                                      borderRadius: BorderRadius.circular(10),
+                                      border: Border.all(color: isSelected ? const Color(0xFF3e5219) : Colors.grey[300]!),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        regions[index],
+                                        style: GoogleFonts.dmSans(color: isSelected ? Colors.white : const Color(0xFF3e5219), fontWeight: isSelected ? FontWeight.bold : FontWeight.normal, fontSize: 12),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // 5. RATING FILTER
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('RATING', style: GoogleFonts.dmSans(fontSize: 11, fontWeight: FontWeight.bold, color: const Color(0xFF3e5219), letterSpacing: 1)),
+                          Row(
+                            children: [
+                              Row(
+                                children: List.generate(5, (index) {
+                                  return GestureDetector(
+                                    onTap: () => setState(() => selectedRating = index + 1),
+                                    child: Icon(
+                                      index < selectedRating ? Icons.star : Icons.star_border,
+                                      color: Colors.amber,
+                                      size: 26,
+                                    ),
+                                  );
+                                }),
+                              ),
+                              if (selectedRating > 0)
+                                TextButton(
+                                  onPressed: () => setState(() => selectedRating = 0),
+                                  child: const Text('Clear', style: TextStyle(color: Colors.red, fontSize: 12)),
+                                )
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // COUNT RESULTS
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      child: Text('${displayedProducts.length} Results Found', style: GoogleFonts.dmSans(fontWeight: FontWeight.bold, color: Colors.grey, fontSize: 12)),
+                    ),
+
+                    // 6. GRID OF PRODUCTS
+                    displayedProducts.isEmpty 
+                    ? const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 30),
+                        child: Center(child: Text("Aucun produit trouvé")),
+                      )
+                    : GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio: 0.72,
+                          crossAxisSpacing: 15,
+                          mainAxisSpacing: 15,
+                        ),
+                        itemCount: displayedProducts.length,
+                        itemBuilder: (ctx, i) => _buildProductCard(context, displayedProducts[i]),
+                      ),
+                    const SizedBox(height: 20),
+                  ],
                 ),
-                itemCount: dummyProducts.length,
-                itemBuilder: (ctx, i) {
-                  final product = dummyProducts[i];
-                  return _buildProductCard(context, product);
-                },
               ),
             ),
           ],
@@ -129,78 +279,72 @@ class _CatalogScreenState extends State<CatalogScreen> {
     bool isFav = favProvider.isFavorite(product.id);
 
     return GestureDetector(
-      onTap: () => Navigator.pushNamed(context, '/product-detail', arguments: product),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10)],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Image + Heart Icon
-            Expanded(
-              child: Stack(
-                children: [
-                  ClipRRect(
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-                    child: Image.network(product.image, width: double.infinity, fit: BoxFit.cover),
-                  ),
-                  Positioned(
-                    top: 10, right: 10,
-                    child: GestureDetector(
-                      onTap: () => favProvider.toggleFavorite(product.id),
-                      child: CircleAvatar(
-                        backgroundColor: Colors.white.withOpacity(0.8),
-                        radius: 15,
-                        child: Icon(
-                          isFav ? Icons.favorite : Icons.favorite_border,
-                          size: 16, color: isFav ? Colors.red : Colors.grey,
-                        ),
-                      ),
+      // 🚨 Hna rj3na l-navigation l-haqiqi l-m9adda b material page route direct sans bogue
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ProductDetailScreen(product: product),
+          ),
+        );
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(15),
+                  child: Container(
+                    width: double.infinity,
+                    color: const Color(0xFFf7f4f0),
+                    child: Image.network(
+                      product.image, 
+                      width: double.infinity, 
+                      fit: BoxFit.cover,
+                      errorBuilder: (c, e, s) => const Center(child: Icon(Icons.image_not_supported, color: Colors.grey)),
                     ),
                   ),
-                ],
-              ),
+                ),
+                Positioned(
+                  top: 10, right: 10,
+                  child: GestureDetector(
+                    onTap: () => favProvider.toggleFavorite(product.id),
+                    child: CircleAvatar(
+                      backgroundColor: Colors.white, radius: 16,
+                      child: Icon(isFav ? Icons.favorite : Icons.favorite_border, size: 18, color: isFav ? Colors.red : Colors.grey),
+                    ),
+                  ),
+                ),
+              ],
             ),
-            // Info Produit
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'COOPÉRATIVE ATLAS',
-                    style: TextStyle(color: Colors.blue[900], fontSize: 8, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    product.name,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-                    maxLines: 1, overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        '${product.price} DH',
-                        style: const TextStyle(color: Color(0xFF94492c), fontWeight: FontWeight.bold),
-                      ),
-                      const Row(
-                        children: [
-                          Icon(Icons.star, color: Colors.amber, size: 10),
-                          Text(' 4.8', style: TextStyle(fontSize: 10)),
-                        ],
-                      )
-                    ],
-                  ),
-                ],
-              ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('COOPÉRATIVE CERTIFIÉE', style: GoogleFonts.dmSans(color: Colors.black38, fontSize: 8, fontWeight: FontWeight.bold, letterSpacing: 0.5)),
+                const SizedBox(height: 2),
+                Text(product.name, style: GoogleFonts.dmSans(fontWeight: FontWeight.bold, fontSize: 13, color: const Color(0xFF45483c)), maxLines: 1, overflow: TextOverflow.ellipsis),
+                const SizedBox(height: 2),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('${product.price} DH', style: GoogleFonts.dmSans(color: const Color(0xFF94492c), fontWeight: FontWeight.bold, fontSize: 14)),
+                    Row(
+                      children: [
+                        const Icon(Icons.star, color: Colors.amber, size: 12),
+                        Text(' 4.8', style: GoogleFonts.dmSans(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.black54)),
+                      ],
+                    )
+                  ],
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
