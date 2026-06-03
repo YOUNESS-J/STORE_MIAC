@@ -68,7 +68,9 @@ class ProfileScreen extends StatelessWidget {
             ListTile(
               onTap: () async {
                 await FirebaseAuth.instance.signOut(); 
-                Navigator.pushReplacementNamed(context, '/main');
+                if (context.mounted) {
+                  Navigator.pushReplacementNamed(context, '/main');
+                }
               },
               title: const Text('Sign Out', style: TextStyle(color: Colors.redAccent)),
               leading: const Icon(Icons.logout, color: Colors.redAccent),
@@ -78,7 +80,6 @@ class ProfileScreen extends StatelessWidget {
       ),
     );
   }
-
 
   Widget _profileItem(String title, IconData icon, {VoidCallback? onTap}) {
     return ListTile(

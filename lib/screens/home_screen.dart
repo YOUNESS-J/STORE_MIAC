@@ -5,6 +5,7 @@ import '../models/product.dart';
 import '../providers/favorite_provider.dart';
 import '../data/static_data.dart';
 import '../screens/product_detail_screen.dart'; 
+import 'custom_drawer.dart'; 
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -43,10 +44,21 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFfffbf7),
+      
+      drawer: const CustomNavigationDrawer(activeRoute: 'dashboard'), 
+
       appBar: AppBar(
         backgroundColor: const Color(0xFFfffbf7),
         elevation: 0,
-        leading: const Icon(Icons.menu, color: Color(0xFF3e5219)), 
+        
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(Icons.menu, color: Color(0xFF3e5219)),
+            onPressed: () {
+              Scaffold.of(context).openDrawer();
+            },
+          ),
+        ), 
         title: Text(
           'MIAC',
           style: GoogleFonts.ebGaramond(
@@ -88,12 +100,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-
               Padding(
                 padding: const EdgeInsets.all(20),
                 child: Container(
                   width: double.infinity, 
-                  height: 190,
+                  padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     color: const Color(0xFF3e5219), 
                     borderRadius: BorderRadius.circular(20),
@@ -103,10 +114,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       opacity: 0.4, 
                     ),
                   ),
-                  padding: const EdgeInsets.all(20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start, 
                     mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min, 
                     children: [
                       Text(
                         'NEW COLLECTION', 
@@ -126,7 +137,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           fontWeight: FontWeight.bold
                         )
                       ),
-                      const SizedBox(height: 15),
+                      const SizedBox(height: 12),
                       ElevatedButton(
                         onPressed: () {},
                         style: ElevatedButton.styleFrom(
@@ -144,15 +155,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'Categories', 
-                      style: GoogleFonts.ebGaramond(fontSize: 22, fontWeight: FontWeight.bold, color: const Color(0xFF3e5219))
+                    Expanded(
+                      child: Text(
+                        'Categories', 
+                        style: GoogleFonts.ebGaramond(fontSize: 22, fontWeight: FontWeight.bold, color: const Color(0xFF3e5219)),
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                     TextButton(
                       onPressed: () => setState(() => selectedCategory = 'All'), 
@@ -164,7 +177,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
-
 
               SizedBox(
                 height: 100,
@@ -201,15 +213,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'Popular Products', 
-                      style: GoogleFonts.ebGaramond(fontSize: 22, fontWeight: FontWeight.bold, color: const Color(0xFF3e5219))
+                    Expanded(
+                      child: Text(
+                        'Popular Products', 
+                        style: GoogleFonts.ebGaramond(fontSize: 22, fontWeight: FontWeight.bold, color: const Color(0xFF3e5219)),
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                     TextButton(
                       onPressed: () {}, 
@@ -222,7 +236,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-
               displayedProducts.isEmpty
               ? const Center(child: Padding(padding: EdgeInsets.all(20), child: Text("No products found")))
               : GridView.builder(
@@ -231,14 +244,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2, 
-                    childAspectRatio: 0.72, 
+                    childAspectRatio: 0.63, 
                     crossAxisSpacing: 15, 
                     mainAxisSpacing: 15
                   ),
                   itemCount: displayedProducts.length > 4 ? 4 : displayedProducts.length,
                   itemBuilder: (ctx, i) => _buildProductCard(context, displayedProducts[i]),
                 ),
-
 
               Padding(
                 padding: const EdgeInsets.only(left: 20, top: 30, right: 20),
@@ -257,7 +269,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
-
 
               SizedBox(
                 height: 130,
@@ -297,7 +308,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-
   Widget _buildProductCard(BuildContext context, Product product) {
     final favProvider = Provider.of<FavoriteProvider>(context);
     bool isFav = favProvider.isFavorite(product.id);
@@ -319,6 +329,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     borderRadius: BorderRadius.circular(15),
                     child: Container(
                       width: double.infinity, 
+                      height: double.infinity, 
                       color: Colors.grey[100],
                       child: Image.network(
                         product.image, 

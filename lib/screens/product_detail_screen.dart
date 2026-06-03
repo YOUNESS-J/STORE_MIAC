@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../models/product.dart';
 import '../providers/cart_provider.dart';
 import '../providers/favorite_provider.dart'; 
+import 'checkout_screen.dart'; 
 
 class ProductDetailScreen extends StatelessWidget {
   final Product product;
@@ -22,7 +23,6 @@ class ProductDetailScreen extends StatelessWidget {
         children: [
           CustomScrollView(
             slivers: [
-              // 
               SliverAppBar(
                 expandedHeight: 450,
                 pinned: true,
@@ -57,7 +57,6 @@ class ProductDetailScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      //
                       Text(
                         "OR PUR D'ESSAOUIRA",
                         style: TextStyle(
@@ -69,7 +68,6 @@ class ProductDetailScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       
-                      // 
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -108,7 +106,6 @@ class ProductDetailScreen extends StatelessWidget {
 
                       const SizedBox(height: 25),
 
-                      // 
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
@@ -153,7 +150,6 @@ class ProductDetailScreen extends StatelessWidget {
 
                       const SizedBox(height: 30),
 
-                      // DESCRIPTION
                       const Text(
                         'Description',
                         style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -176,7 +172,6 @@ class ProductDetailScreen extends StatelessWidget {
             ],
           ),
 
-          // 
           Positioned(
             bottom: 0,
             left: 0,
@@ -191,7 +186,6 @@ class ProductDetailScreen extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  // 
                   Container(
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.grey[300]!),
@@ -206,7 +200,7 @@ class ProductDetailScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 15),
-                  //
+                  
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
@@ -215,8 +209,12 @@ class ProductDetailScreen extends StatelessWidget {
                           Navigator.pushNamed(context, '/auth');
                         } else {
                           Provider.of<CartProvider>(context, listen: false).addItem(product);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('${product.name} ajouté !')),
+                          
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => CheckoutScreen(product: product),
+                            ),
                           );
                         }
                       },
@@ -229,9 +227,9 @@ class ProductDetailScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(Icons.shopping_bag_outlined, color: Colors.white),
-                          SizedBox(width: 10),
+                          const SizedBox(width: 10),
                           Text(
-                            'Ajouter au panier',
+                            'Acheter maintenant', 
                             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
                           ),
                         ],
