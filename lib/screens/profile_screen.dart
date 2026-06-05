@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:firebase_auth/firebase_auth.dart'; 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:store_miac/screens/orders_history_screen.dart'; 
 import 'favorites_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -49,7 +50,14 @@ class ProfileScreen extends StatelessWidget {
             
 
             _profileItem('Account Settings', Icons.settings_outlined),
-            _profileItem('My Orders', Icons.shopping_bag_outlined),
+            _profileItem('My Orders', Icons.shopping_bag_outlined, onTap: () {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => const OrdersHistoryScreen(),
+    ),
+  );
+},),
             _profileItem('Shipping Addresses', Icons.location_on_outlined),
             
 

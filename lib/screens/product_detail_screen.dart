@@ -2,20 +2,133 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
+import 'package:store_miac/screens/cart_screen.dart';
+import 'package:audioplayers/audioplayers.dart'; // L-package l-jdīd
 import '../models/product.dart';
 import '../providers/cart_provider.dart';
 import '../providers/favorite_provider.dart'; 
 import 'checkout_screen.dart'; 
 
-class ProductDetailScreen extends StatelessWidget {
+class ProductDetailScreen extends StatefulWidget {
   final Product product;
   const ProductDetailScreen({required this.product, super.key});
 
   @override
+  State<ProductDetailScreen> createState() => _ProductDetailScreenState();
+}
+
+class _ProductDetailScreenState extends State<ProductDetailScreen> {
+  late AudioPlayer _audioPlayer;
+  bool _isPlaying = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _audioPlayer = AudioPlayer();
+
+    // N-sm3o l-player ila sala l-audio bo7do, n-rj3o l-icon l-Play
+    _audioPlayer.onPlayerComplete.listen((event) {
+      setState(() => _isPlaying = false);
+    });
+  }
+
+  @override
+  void dispose() {
+    _audioPlayer.dispose(); // S-sawt y-skt o y-tms7 mn l-mémoire ila khrjna
+    super.dispose();
+  }
+
+  // L-methode li kat-7ded s-smiya d l-audio mn loun/smiya d produit
+  String _getAudioPath(String productName) {
+    String name = productName.toLowerCase();
+    if (name.contains('foulard')) return 'audio/foulard.mp3';
+    if (name.contains('safran') || name.contains('cactus')) return 'audio/zafran.mp3';
+    
+    // Default audio ila l-produit makaynch s-sawt dyalo exact
+    return 'audio/default_histoire.mp3'; 
+  }
+
+  void _showHistoireBottomSheet(BuildContext context, String productName) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (ctx) {
+        return Container(
+          padding: const EdgeInsets.all(24),
+          height: MediaQuery.of(context).size.height * 0.55,
+          decoration: const BoxDecoration(
+            color: Color(0xFFfcf9f0),
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(30),
+              topRight: Radius.circular(30),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40, 
+                  height: 5, 
+                  decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(10)),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  const Icon(Icons.mic_external_on_rounded, color: Color(0xFF94492c)),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      "L'histoire de: $productName",
+                      style: GoogleFonts.ebGaramond(fontSize: 22, fontWeight: FontWeight.bold, color: const Color(0xFF3e5219)),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 15),
+              Divider(color: Colors.grey[200]),
+              const SizedBox(height: 15),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Text(
+                    widget.product.description,
+                    style: GoogleFonts.dmSans(fontSize: 15, color: const Color(0xFF45483c), height: 1.6, fontStyle: FontStyle.italic),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 15),
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF3e5219),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  onPressed: () {
+                    _audioPlayer.stop();
+                    setState(() => _isPlaying = false);
+                    Navigator.pop(ctx);
+                  },
+                  child: Text("Fermer", style: GoogleFonts.dmSans(color: Colors.white, fontWeight: FontWeight.bold)),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    ).then((value) {
+      _audioPlayer.stop();
+      setState(() => _isPlaying = false);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final favProvider = Provider.of<FavoriteProvider>(context);
-    final isFav = favProvider.isFavorite(product.id);
+    final isFav = favProvider.isFavorite(widget.product.id);
 
     return Scaffold(
       backgroundColor: const Color(0xFFfcf9f0),
@@ -36,7 +149,9 @@ class ProductDetailScreen extends StatelessWidget {
                 ),
                 actions: [
                   IconButton(
-                    onPressed: () => Navigator.pushNamed(context, '/cart'),
+                    onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const CartScreen()));
+                    },
                     icon: const CircleAvatar(
                       backgroundColor: Colors.white24,
                       child: Icon(Icons.shopping_cart_outlined, color: Colors.white),
@@ -45,8 +160,8 @@ class ProductDetailScreen extends StatelessWidget {
                 ],
                 flexibleSpace: FlexibleSpaceBar(
                   background: Hero(
-                    tag: 'img-${product.id}',
-                    child: Image.network(product.image, fit: BoxFit.cover),
+                    tag: 'img-${widget.product.id}',
+                    child: Image.network(widget.product.image, fit: BoxFit.cover),
                   ),
                 ),
               ),
@@ -59,12 +174,7 @@ class ProductDetailScreen extends StatelessWidget {
                     children: [
                       Text(
                         "OR PUR D'ESSAOUIRA",
-                        style: TextStyle(
-                          color: Colors.blue[900],
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.5,
-                        ),
+                        style: TextStyle(color: Colors.blue[900], fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.5),
                       ),
                       const SizedBox(height: 8),
                       
@@ -74,24 +184,16 @@ class ProductDetailScreen extends StatelessWidget {
                         children: [
                           Expanded(
                             child: Text(
-                              product.name,
-                              style: GoogleFonts.ebGaramond(
-                                fontSize: 32,
-                                fontWeight: FontWeight.bold,
-                                color: const Color(0xFF3e5219),
-                              ),
+                              widget.product.name,
+                              style: GoogleFonts.ebGaramond(fontSize: 32, fontWeight: FontWeight.bold, color: const Color(0xFF3e5219)),
                             ),
                           ),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Text(
-                                '${product.price.toInt()} DH',
-                                style: const TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF94492c),
-                                ),
+                                '${widget.product.price.toInt()} DH',
+                                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF94492c)),
                               ),
                               const Row(
                                 children: [
@@ -106,64 +208,55 @@ class ProductDetailScreen extends StatelessWidget {
 
                       const SizedBox(height: 25),
 
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF5b42f3), Color(0xFF8000ff)],
+                      // Bouton dynamic dyal l-audio mp3 dyalk 7é9é9i!
+                      GestureDetector(
+                        onTap: () async {
+                          if (_isPlaying) {
+                            await _audioPlayer.stop();
+                            setState(() => _isPlaying = false);
+                          } else {
+                            setState(() => _isPlaying = true);
+                            
+                            // Kat-playi l-audio mn l-assets nichan
+                            String audioPath = _getAudioPath(widget.product.name);
+                            await _audioPlayer.play(AssetSource(audioPath));
+                            
+                            _showHistoireBottomSheet(context, widget.product.name);
+                          }
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(colors: [Color(0xFF5b42f3), Color(0xFF8000ff)]),
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [BoxShadow(color: const Color(0xFF5b42f3).withOpacity(0.3), blurRadius: 15, offset: const Offset(0, 8))],
                           ),
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(0xFF5b42f3).withOpacity(0.3),
-                              blurRadius: 15,
-                              offset: const Offset(0, 8),
-                            )
-                          ],
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.graphic_eq, color: Colors.white, size: 30),
-                            const SizedBox(width: 15),
-                            const Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "Écouter l'histoire",
-                                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
-                                  ),
-                                  Text(
-                                    "La voix de nos artisanes",
-                                    style: TextStyle(color: Colors.white70, fontSize: 12),
-                                  ),
-                                ],
+                          child: Row(
+                            children: [
+                              Icon(_isPlaying ? Icons.stop_circle_rounded : Icons.play_circle_fill, color: Colors.white, size: 40),
+                              const SizedBox(width: 15),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      _isPlaying ? "Lecture du récit..." : "Écouter la voix de l'artisane",
+                                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                                    ),
+                                    const Text("Enregistrement audio authentique", style: TextStyle(color: Colors.white70, fontSize: 12)),
+                                  ],
+                                ),
                               ),
-                            ),
-                            IconButton(
-                              onPressed: () {}, 
-                              icon: const Icon(Icons.play_circle_fill, color: Colors.white, size: 40),
-                            )
-                          ],
+                              if (_isPlaying) const Icon(Icons.volume_up, color: Colors.white)
+                            ],
+                          ),
                         ),
                       ),
 
                       const SizedBox(height: 30),
-
-                      const Text(
-                        'Description',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
+                      const Text('Description', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 12),
-                      Text(
-                        product.description,
-                        style: const TextStyle(
-                          fontSize: 15,
-                          height: 1.6,
-                          color: Color(0xFF45483c),
-                        ),
-                      ),
-
+                      Text(widget.product.description, style: const TextStyle(fontSize: 15, height: 1.6, color: Color(0xFF45483c))),
                       const SizedBox(height: 120),
                     ],
                   ),
@@ -173,34 +266,20 @@ class ProductDetailScreen extends StatelessWidget {
           ),
 
           Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
+            bottom: 0, left: 0, right: 0,
             child: Container(
               padding: const EdgeInsets.fromLTRB(24, 20, 24, 40),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 20, offset: const Offset(0, -5)),
-                ],
-              ),
+              decoration: BoxDecoration(color: Colors.white, boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 20, offset: const Offset(0, -5))]),
               child: Row(
                 children: [
                   Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey[300]!),
-                      borderRadius: BorderRadius.circular(15),
-                    ),
+                    decoration: BoxDecoration(border: Border.all(color: Colors.grey[300]!), borderRadius: BorderRadius.circular(15)),
                     child: IconButton(
-                      onPressed: () => favProvider.toggleFavorite(product.id),
-                      icon: Icon(
-                        isFav ? Icons.favorite : Icons.favorite_border,
-                        color: isFav ? Colors.red : Colors.grey,
-                      ),
+                      onPressed: () => favProvider.toggleFavorite(widget.product.id),
+                      icon: Icon(isFav ? Icons.favorite : Icons.favorite_border, color: isFav ? Colors.red : Colors.grey),
                     ),
                   ),
                   const SizedBox(width: 15),
-                  
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
@@ -208,14 +287,8 @@ class ProductDetailScreen extends StatelessWidget {
                         if (user == null) {
                           Navigator.pushNamed(context, '/auth');
                         } else {
-                          Provider.of<CartProvider>(context, listen: false).addItem(product);
-                          
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => CheckoutScreen(product: product),
-                            ),
-                          );
+                          Provider.of<CartProvider>(context, listen: false).addItem(widget.product);
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => CheckoutScreen(product: widget.product)));
                         }
                       },
                       style: ElevatedButton.styleFrom(
@@ -227,11 +300,8 @@ class ProductDetailScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(Icons.shopping_bag_outlined, color: Colors.white),
-                          const SizedBox(width: 10),
-                          Text(
-                            'Acheter maintenant', 
-                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
-                          ),
+                          SizedBox(width: 10),
+                          Text('Acheter maintenant', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
                         ],
                       ),
                     ),

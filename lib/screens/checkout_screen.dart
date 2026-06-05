@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:store_miac/screens/orders_history_screen.dart';
 import '../models/product.dart';
 import '../models/order_manager.dart'; 
 
@@ -87,7 +88,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           },
         ),
         title: Text(
-          _currentStep == 1 ? 'Secure Checkout' : 'Zellij Market',
+          _currentStep == 1 ? 'Secure Checkout' : 'MIAC',
           style: GoogleFonts.ebGaramond(
             color: const Color(0xFF3e5219),
             fontWeight: FontWeight.bold,
@@ -198,7 +199,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           Text('Ville', style: GoogleFonts.dmSans(fontWeight: FontWeight.bold, fontSize: 13, color: const Color(0xFF45483c))),
           const SizedBox(height: 6),
           DropdownButtonFormField<String>(
-            value: _selectedCity,
+            initialValue: _selectedCity,
             decoration: InputDecoration(
               fillColor: const Color(0xFFf7f4f0),
               filled: true,
@@ -473,31 +474,42 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   void _showSuccessDialog() {
-    OrderManager.addOrder(widget.product, _selectedPaymentMethod);
+  // Kat-sifit l-produit dynamicly l l-manager bla ma t-khreb l-app
+  OrderManager.addOrder(
+    widget.product.name, 
+    widget.product.price, 
+    widget.product.image
+  );
 
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Icon(Icons.check_circle, color: Color(0xFF3e5219), size: 60),
-        content: Text(
-          _selectedPaymentMethod == 'COD' 
-            ? 'Votre commande a été enregistrée avec succès! Vous payerez à la livraison.' 
-            : 'Votre paiement a été traité en toute sécurité o commande dazet perfectly!', 
-          textAlign: TextAlign.center, 
-          style: GoogleFonts.dmSans()
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              Navigator.pop(context);
-            },
-            child: Text('Parfait', style: GoogleFonts.dmSans(color: const Color(0xFF94492c), fontWeight: FontWeight.bold)),
-          ),
-        ],
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (ctx) => AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      title: const Icon(Icons.check_circle, color: Color(0xFF3e5219), size: 60),
+      content: Text(
+        _selectedPaymentMethod == 'COD' 
+          ? 'Votre commande a été enregistrée avec succès! Vous payerez à la livraison.' 
+          : 'Votre paiement a été traité en toute sécurité o commande dazet perfectly!', 
+        textAlign: TextAlign.center, 
+        style: GoogleFonts.dmSans()
       ),
-    );
-  }
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.pop(ctx); // Sdd l-dialog
+            Navigator.pop(context); // Rj3 l-home directly
+            
+            // Di l-user direct l l-historique bach i-tchif l-tracking line perfectly!
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const OrdersHistoryScreen()),
+            );
+          },
+          child: Text('Parfait', style: GoogleFonts.dmSans(color: const Color(0xFF94492c), fontWeight: FontWeight.bold)),
+        ),
+      ],
+    ),
+  );
+}
 }

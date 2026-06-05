@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../models/order.dart';
 import '../models/order_manager.dart';
 
 class OrdersHistoryScreen extends StatelessWidget {
@@ -9,16 +8,16 @@ class OrdersHistoryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFfffbf7),
+      backgroundColor: const Color(0xFFfffbf7), 
       appBar: AppBar(
         backgroundColor: const Color(0xFFfffbf7),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.menu, color: Color(0xFF3e5219)),
-          onPressed: () {},
+          icon: const Icon(Icons.arrow_back, color: Color(0xFF3e5219)),
+          onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Zellij Market',
+          'MIAC',
           style: GoogleFonts.ebGaramond(
             color: const Color(0xFF94492c),
             fontWeight: FontWeight.bold,
@@ -114,7 +113,7 @@ class OrdersHistoryScreen extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: Image.network(
-                  order.product.image,
+                  order.productImage,
                   width: 70,
                   height: 70,
                   fit: BoxFit.cover,
@@ -126,14 +125,14 @@ class OrdersHistoryScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      order.product.name,
+                      order.productName,
                       style: GoogleFonts.dmSans(fontSize: 15, fontWeight: FontWeight.bold, color: const Color(0xFF45483c)),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${order.product.price.toStringAsFixed(2).replaceAll('.', ',')} DH',
+                      '${order.productPrice.toInt()} DH',
                       style: GoogleFonts.dmSans(fontSize: 17, fontWeight: FontWeight.bold, color: const Color(0xFF94492c)),
                     ),
                   ],
@@ -142,7 +141,7 @@ class OrdersHistoryScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 15),
-          _buildDeliveryTracker(order.status), 
+          _buildDeliveryTracker(order.status),
           const SizedBox(height: 15),
           SizedBox(
             width: double.infinity,
@@ -153,7 +152,7 @@ class OrdersHistoryScreen extends StatelessWidget {
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 backgroundColor: Colors.grey[200]!.withOpacity(0.3),
               ),
-              onPressed: () {},
+              onPressed: () {_showOrderDetailsSheet(context, order);},
               child: Text(
                 'DÉTAILS DE LA COMMANDE',
                 style: GoogleFonts.dmSans(fontSize: 12, fontWeight: FontWeight.bold, color: const Color(0xFF45483c), letterSpacing: 0.8),
@@ -165,27 +164,20 @@ class OrdersHistoryScreen extends StatelessWidget {
     );
   }
 
+  // Tzadet condition dyal 'Livré' b l-alwan dyalha
   Widget _buildStatusBadge(OrderStatus status) {
-    String text = '';
-    Color bgColor = Colors.transparent;
-    Color textColor = Colors.transparent;
+    String text = 'En attente';
+    Color bgColor = const Color(0xFFfcefe9);
+    Color textColor = const Color(0xFF94492c);
 
-    switch (status) {
-      case OrderStatus.enAttente:
-        text = 'En attente';
-        bgColor = const Color(0xFFfcefe9);
-        textColor = const Color(0xFF94492c);
-        break;
-      case OrderStatus.enTransit:
-        text = 'Expédié';
-        bgColor = const Color(0xFFeef3e6);
-        textColor = const Color(0xFF3e5219);
-        break;
-      case OrderStatus.livre:
-        text = 'Livré';
-        bgColor = Colors.grey[200]!;
-        textColor = Colors.black54;
-        break;
+    if (status == OrderStatus.enTransit) {
+      text = 'Expédié';
+      bgColor = const Color(0xFFeef3e6);
+      textColor = const Color(0xFF3e5219);
+    } else if (status == OrderStatus.livre) {
+      text = 'Livré';
+      bgColor = Colors.grey[300]!;
+      textColor = Colors.black54;
     }
 
     return Container(
@@ -196,6 +188,7 @@ class OrdersHistoryScreen extends StatelessWidget {
   }
 
   Widget _buildDeliveryTracker(OrderStatus status) {
+    // Tgadet l-index dyal 'Livré' bach tbddel l-barre kamla
     int activeIndex = 0;
     if (status == OrderStatus.enTransit) activeIndex = 1;
     if (status == OrderStatus.livre) activeIndex = 2;
@@ -220,8 +213,8 @@ class OrdersHistoryScreen extends StatelessWidget {
               _buildTrackerDot(activeIndex >= 0),
               _buildTrackerLine(activeIndex >= 1),
               _buildTrackerDot(activeIndex >= 1),
-              _buildTrackerLine(activeIndex >= 2),
-              _buildTrackerDot(activeIndex >= 2),
+              _buildTrackerLine(activeIndex >= 2), // Hna katsali l-barre
+              _buildTrackerDot(activeIndex >= 2),  // No9ta lkhra dyal Livré
             ],
           ),
           const SizedBox(height: 6),
@@ -233,6 +226,137 @@ class OrdersHistoryScreen extends StatelessWidget {
               _buildTrackerLabel('Livré', activeIndex == 2),
             ],
           ),
+        ],
+      ),
+    );
+  }
+  void _showOrderDetailsSheet(BuildContext context, OrderModel order) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(24),
+          decoration: const BoxDecoration(
+            color: Color(0xFFfffbf7),
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(25),
+              topRight: Radius.circular(25),
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // L-barre sghira li l-fou9 (design)
+              Center(
+                child: Container(
+                  width: 50,
+                  height: 5,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 25),
+              
+              // L-3unwan
+              Text(
+                'Détails de la commande',
+                style: GoogleFonts.ebGaramond(
+                  fontSize: 24, 
+                  fontWeight: FontWeight.bold, 
+                  color: const Color(0xFF3e5219)
+                ),
+              ),
+              const SizedBox(height: 20),
+              
+              // S-sora o s-smiya dyal produit
+              Row(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(15),
+                    child: Image.network(
+                      order.productImage, 
+                      width: 80, 
+                      height: 80, 
+                      fit: BoxFit.cover
+                    ),
+                  ),
+                  const SizedBox(width: 15),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          order.productName, 
+                          style: GoogleFonts.dmSans(fontSize: 16, fontWeight: FontWeight.bold, color: const Color(0xFF45483c))
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          '${order.productPrice.toInt()} MAD', 
+                          style: GoogleFonts.dmSans(color: const Color(0xFF94492c), fontWeight: FontWeight.bold, fontSize: 18)
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+              const SizedBox(height: 20),
+              Divider(color: Colors.grey[200], thickness: 1.5),
+              const SizedBox(height: 15),
+              
+              // L-m3loumat (Details)
+              _buildDetailRow('Numéro de commande', '#${order.orderNumber}'),
+              _buildDetailRow('Date d\'achat', '${order.date.day}/${order.date.month}/${order.date.year} - ${order.date.hour}:${order.date.minute.toString().padLeft(2, '0')}'),
+              _buildDetailRow('Statut actuel', order.status == OrderStatus.livre ? 'Livré' : (order.status == OrderStatus.enTransit ? 'Expédié' : 'En attente')),
+              _buildDetailRow('Moyen de paiement', 'Paiement à la livraison / Carte'),
+              
+              const SizedBox(height: 10),
+              Divider(color: Colors.grey[200], thickness: 1.5),
+              const SizedBox(height: 10),
+              
+              // Total
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Total payé', style: GoogleFonts.dmSans(fontSize: 16, fontWeight: FontWeight.bold, color: const Color(0xFF45483c))),
+                  Text('${order.productPrice.toInt()} MAD', style: GoogleFonts.dmSans(fontSize: 18, fontWeight: FontWeight.bold, color: const Color(0xFF94492c))),
+                ],
+              ),
+              
+              const SizedBox(height: 30),
+              
+              // Bouton bach t-sed
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF3e5219),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                  ),
+                  onPressed: () => Navigator.pop(context),
+                  child: Text('Fermer', style: GoogleFonts.dmSans(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildDetailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: GoogleFonts.dmSans(color: Colors.black54, fontSize: 14)),
+          Text(value, style: GoogleFonts.dmSans(fontWeight: FontWeight.bold, color: const Color(0xFF45483c), fontSize: 14)),
         ],
       ),
     );

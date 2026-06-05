@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:store_miac/screens/cart_screen.dart';
 import '../models/product.dart'; 
 import '../providers/favorite_provider.dart';
 import '../data/static_data.dart';
@@ -69,9 +70,18 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.shopping_cart_outlined, color: Color(0xFF3e5219)),
-            onPressed: () {}, 
-          ),
+    icon: const Icon(Icons.shopping_cart_outlined, color: Color(0xFF3e5219)), // Nfs l-loun ziti dyal l-app dyalk
+    onPressed: () {
+      // Hna kandiw l-user l-page dyal l-Cart
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const CartScreen(), // T2ked mn s-smiya dyal page dyal l-cart 3ndk
+        ),
+      );
+    },
+  ),
+  const SizedBox(width: 8), // Bach n-khelliw chwiya t-tisa3 mn l-jnnb
         ],
       ),
       body: SafeArea(

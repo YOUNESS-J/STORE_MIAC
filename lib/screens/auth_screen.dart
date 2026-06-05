@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -15,12 +16,15 @@ class _AuthScreenState extends State<AuthScreen> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   bool _acceptTerms = false; 
+  bool _googleSignInInitialized = false;
 
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
+  
+  
 
   @override
   void dispose() {
@@ -39,6 +43,48 @@ class _AuthScreenState extends State<AuthScreen> {
         backgroundColor: Colors.redAccent,
       ),
     );
+  }
+  Future<void> _ensureGoogleSignInInitialized() async {
+    if (_googleSignInInitialized) return;
+
+    await GoogleSignIn.instance.initialize();
+    _googleSignInInitialized = true;
+  }
+
+  Future<void> _signInWithGoogle() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      await _ensureGoogleSignInInitialized();
+
+      final GoogleSignInAccount googleUser =
+          await GoogleSignIn.instance.authenticate();
+      final GoogleSignInAuthentication googleAuth = googleUser.authentication;
+
+      final credential = GoogleAuthProvider.credential(
+        idToken: googleAuth.idToken,
+      );
+
+      await FirebaseAuth.instance.signInWithCredential(credential);
+
+      if (mounted) {
+        Navigator.pop(context);
+      }
+    } on GoogleSignInException catch (e) {
+      if (e.code != GoogleSignInExceptionCode.canceled) {
+        _showError("Erreur lors de la connexion Google: ${e.description}");
+      }
+    } catch (e) {
+      _showError("Erreur lors de la connexion Google: ${e.toString()}");
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
   }
 
   Future<void> _submitAuth() async {
@@ -154,7 +200,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(28),
                     boxShadow: [
-                      BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 20, offset: const Offset(0, 10))
+                      BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 20, offset: const Offset(0, 10))
                     ],
                   ),
                   child: Column(
@@ -380,7 +426,7 @@ class _AuthScreenState extends State<AuthScreen> {
           color: Colors.white
         ),
         child: InkWell(
-          onTap: () {},
+          onTap: isLoading ? null : _signInWithGoogle, // Rbeṭnah hna perfectly
           borderRadius: BorderRadius.circular(12),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
