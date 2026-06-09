@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -16,15 +16,12 @@ class _AuthScreenState extends State<AuthScreen> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   bool _acceptTerms = false; 
-  bool _googleSignInInitialized = false;
 
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
-  
-  
 
   @override
   void dispose() {
@@ -44,40 +41,52 @@ class _AuthScreenState extends State<AuthScreen> {
       ),
     );
   }
-  Future<void> _ensureGoogleSignInInitialized() async {
-    if (_googleSignInInitialized) return;
 
-    await GoogleSignIn.instance.initialize();
-    _googleSignInInitialized = true;
+  GoogleAuthProvider _googleProvider() {
+    return GoogleAuthProvider()
+      ..addScope('email')
+      ..addScope('profile');
   }
 
-  Future<void> _signInWithGoogle() async {
+  FacebookAuthProvider _facebookProvider() {
+    return FacebookAuthProvider()
+      ..addScope('email')
+      ..addScope('public_profile');
+  }
+
+  Future<bool> _signInWithAuthProvider(AuthProvider provider) async {
+    if (kIsWeb) {
+      await FirebaseAuth.instance.signInWithPopup(provider);
+    } else {
+      await FirebaseAuth.instance.signInWithProvider(provider);
+    }
+    return true;
+  }
+
+  Future<void> _signInWithSocialProvider({
+    required AuthProvider provider,
+    required String providerName,
+  }) async {
     setState(() {
       isLoading = true;
     });
 
     try {
-      await _ensureGoogleSignInInitialized();
+      final bool signedIn = await _signInWithAuthProvider(provider);
 
-      final GoogleSignInAccount googleUser =
-          await GoogleSignIn.instance.authenticate();
-      final GoogleSignInAuthentication googleAuth = googleUser.authentication;
-
-      final credential = GoogleAuthProvider.credential(
-        idToken: googleAuth.idToken,
-      );
-
-      await FirebaseAuth.instance.signInWithCredential(credential);
-
-      if (mounted) {
+      if (signedIn && mounted) {
         Navigator.pop(context);
       }
-    } on GoogleSignInException catch (e) {
-      if (e.code != GoogleSignInExceptionCode.canceled) {
-        _showError("Erreur lors de la connexion Google: ${e.description}");
+    } on FirebaseAuthException catch (e) {
+      if (e.code != 'web-context-cancelled' &&
+          e.code != 'popup-closed-by-user' &&
+          e.code != 'cancelled-popup-request') {
+        _showError(
+          e.message ?? "Erreur lors de la connexion $providerName.",
+        );
       }
     } catch (e) {
-      _showError("Erreur lors de la connexion Google: ${e.toString()}");
+      _showError("Erreur lors de la connexion $providerName: ${e.toString()}");
     } finally {
       if (mounted) {
         setState(() {
@@ -85,6 +94,20 @@ class _AuthScreenState extends State<AuthScreen> {
         });
       }
     }
+  }
+
+  Future<void> _signInWithGoogle() {
+    return _signInWithSocialProvider(
+      provider: _googleProvider(),
+      providerName: 'Google',
+    );
+  }
+
+  Future<void> _signInWithFacebook() {
+    return _signInWithSocialProvider(
+      provider: _facebookProvider(),
+      providerName: 'Facebook',
+    );
   }
 
   Future<void> _submitAuth() async {
@@ -459,7 +482,7 @@ class _AuthScreenState extends State<AuthScreen> {
           color: Colors.white
         ),
         child: InkWell(
-          onTap: () {},
+          onTap: isLoading ? null : _signInWithFacebook,
           borderRadius: BorderRadius.circular(12),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,

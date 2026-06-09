@@ -35,7 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final List<Product> allProducts = products ?? []; 
+    final List<Product> allProducts = products; 
 
     final List<Product> displayedProducts = allProducts.where((product) {
       bool matchesSearch = product.name.toLowerCase().contains(searchQuery.toLowerCase());
@@ -390,7 +390,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     const Icon(Icons.star, color: Colors.amber, size: 12),
                     Text(
-                      ' ${product.rating ?? 4.8} (12)', 
+                      ' ${product.rating.toStringAsFixed(1)} (12)', 
                       style: GoogleFonts.dmSans(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.black54)
                     ),
                   ],
